@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/authRoutes");
 const documentRoutes = require("./routes/documentRoutes");
+const signatureRoutes = require("./routes/signatureRoutes");
 
 const connectDB = require("./config/db");
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/api/docs", documentRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/uploads", express.static("uploads"));
+app.use("/api/signatures", signatureRoutes);
 
 
 app.get("/", (req, res) => {
