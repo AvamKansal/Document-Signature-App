@@ -13,6 +13,10 @@ const signatureSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    
+    signatureImage: {
+      type: String,
+    },
 
     page: {
       type: Number,
