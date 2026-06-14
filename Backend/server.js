@@ -7,6 +7,7 @@ const signatureRoutes = require("./routes/signatureRoutes");
 const pdfRoutes = require("./routes/pdfRoutes");
 const connectDB = require("./config/db");
 const signatureUploadRoutes =require("./routes/signatureUploadRoutes");
+const emailRoutes = require("./routes/emailRoutes");
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/signatures", signatureRoutes);
 app.use("/api/pdf",pdfRoutes);
 app.use("/api/signature-upload",signatureUploadRoutes);
+app.use("/api/email",emailRoutes);
 
 
 app.get("/", (req, res) => {

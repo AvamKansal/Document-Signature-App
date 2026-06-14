@@ -22,6 +22,14 @@ const documentSchema = new mongoose.Schema(
       ref: "User",
     },
 
+    signingToken: {
+      type: String,
+    },
+
+    signerEmail: {
+      type: String,
+    },
+    
     status: {
       type: String,
       enum: ["Pending", "Signed", "Rejected"],

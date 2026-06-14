@@ -20,6 +20,37 @@ function Dashboard() {
     }
   };
 
+  const generateLink = async (documentId) => {
+    const email = prompt(
+      "Enter signer email:"
+    );
+
+    if (!email) return;
+
+    try {
+      const res = await API.post(
+        "/email/generate-link",
+        {
+          documentId,
+          email,
+        }
+      );
+
+      alert(
+        `Signing Link:\n${res.data.signingLink}`
+      );
+
+      console.log(
+        res.data.signingLink
+      );
+    } catch (error) {
+      console.log(error);
+      alert(
+        "Failed to generate signing link"
+      );
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -42,30 +73,48 @@ function Dashboard() {
             >
               <h3>{doc.title}</h3>
 
-<p>
-  <strong>Status:</strong>{" "}
-  <span
-    style={{
-      color:
-        doc.status === "Signed"
-          ? "green"
-          : doc.status === "Rejected"
-          ? "red"
-          : "orange",
-      fontWeight: "bold",
-    }}
-  >
-    {doc.status}
-  </span>
-</p>
+              <p>
+                <strong>Status:</strong>{" "}
+                <span
+                  style={{
+                    color:
+                      doc.status === "Signed"
+                        ? "green"
+                        : doc.status === "Rejected"
+                        ? "red"
+                        : "orange",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {doc.status}
+                </span>
+              </p>
 
-              <button
-                onClick={() =>
-                  navigate(`/document/${doc._id}`)
-                }
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  marginTop: "10px",
+                }}
               >
-                Open Document
-              </button>
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/document/${doc._id}`
+                    )
+                  }
+                >
+                  Open Document
+                </button>
+
+                <button
+                  onClick={() =>
+                    generateLink(doc._id)
+                  }
+                >
+                  Generate Signing Link
+                </button>
+              </div>
             </div>
           ))
         )}
