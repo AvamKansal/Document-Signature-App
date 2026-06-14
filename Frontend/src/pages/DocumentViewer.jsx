@@ -37,19 +37,11 @@ function DocumentViewer() {
     }
   };
 
-  const generatePdf = async () => {
-    try {
-      const res = await API.get(
-        `/pdf/generate/${id}`
-      );
-
-      alert("Signed PDF Generated!");
-
-      console.log(res.data);
-    } catch (error) {
-      console.log(error);
-      alert("Failed to generate PDF");
-    }
+  const generatePdf = () => {
+    window.open(
+      `http://localhost:5000/api/pdf/generate/${id}`,
+      "_blank"
+    );
   };
 
   if (!document) {
@@ -57,7 +49,7 @@ function DocumentViewer() {
   }
 
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h1>{document.title}</h1>
 
       <button
@@ -66,6 +58,7 @@ function DocumentViewer() {
           padding: "10px 20px",
           marginBottom: "20px",
           cursor: "pointer",
+          borderRadius: "5px",
         }}
       >
         Generate Signed PDF
