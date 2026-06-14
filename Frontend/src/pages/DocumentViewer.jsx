@@ -1,60 +1,82 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import API from "../services/api";
+import PdfViewer from "../components/PdfViewer";
 
-function DocumentViewer({ documentId }) {
-  const [position, setPosition] = useState({
-    x: 100,
-    y: 100,
-  });
+function DocumentViewer() {
+  const { id } = useParams();
 
-  const savePosition = async () => {
-    await API.post("/signatures", {
-      documentId,
-      x: position.x,
-      y: position.y,
-      page: 1,
-    });
+  const [document, setDocument] = useState(null);
+  const [signatures, setSignatures] = useState([]);
 
-    alert("Signature Position Saved");
+  useEffect(() => {
+    fetchDocument();
+    fetchSignatures();
+  }, []);
+
+  const fetchDocument = async () => {
+    try {
+      const res = await API.get("/docs");
+
+      const selectedDoc = res.data.find(
+        (doc) => doc._id === id
+      );
+
+      setDocument(selectedDoc);
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  const fetchSignatures = async () => {
+    try {
+      const res = await API.get(`/signatures/${id}`);
+      setSignatures(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const generatePdf = async () => {
+    try {
+      const res = await API.get(
+        `/pdf/generate/${id}`
+      );
+
+      alert("Signed PDF Generated!");
+
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+      alert("Failed to generate PDF");
+    }
+  };
+
+  if (!document) {
+    return <h2>Loading...</h2>;
+  }
 
   return (
     <div>
-      <h2>Document Viewer</h2>
+      <h1>{document.title}</h1>
 
-      <div
+      <button
+        onClick={generatePdf}
         style={{
-          width: "800px",
-          height: "1000px",
-          border: "1px solid black",
-          position: "relative",
+          padding: "10px 20px",
+          marginBottom: "20px",
+          cursor: "pointer",
         }}
       >
-        <div
-          draggable
-          onDragEnd={(e) =>
-            setPosition({
-              x: e.clientX,
-              y: e.clientY,
-            })
-          }
-          style={{
-            position: "absolute",
-            left: position.x,
-            top: position.y,
-            width: "150px",
-            height: "50px",
-            border: "2px dashed blue",
-            cursor: "move",
-          }}
-        >
-          Sign Here
-        </div>
-      </div>
-
-      <button onClick={savePosition}>
-        Save Signature Position
+        Generate Signed PDF
       </button>
+
+      <PdfViewer
+        fileUrl={`http://localhost:5000/${document.filePath}`}
+        signatures={signatures}
+        documentId={id}
+        refreshSignatures={fetchSignatures}
+      />
     </div>
   );
 }
