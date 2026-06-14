@@ -2,6 +2,29 @@ const { v4: uuidv4 } = require("uuid");
 
 const Document = require("../models/Document");
 
+const getDocumentByToken = async (
+  req,
+  res
+) => {
+  try {
+    const document = await Document.findOne({
+      signingToken: req.params.token,
+    });
+
+    if (!document) {
+      return res.status(404).json({
+        message: "Invalid signing link",
+      });
+    }
+
+    res.status(200).json(document);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 const generateSigningLink = async (
   req,
   res
@@ -37,6 +60,4 @@ const generateSigningLink = async (
   }
 };
 
-module.exports = {
-  generateSigningLink,
-};
+module.exports = {generateSigningLink,getDocumentByToken,};

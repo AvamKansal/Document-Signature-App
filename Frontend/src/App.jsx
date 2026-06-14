@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import DocumentViewer from "./pages/DocumentViewer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicSign from "./pages/PublicSign";
-e
+
 function App() {
   return (
     <BrowserRouter>
@@ -14,17 +14,25 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/sign/:token" element={<PublicSign />}/>
-        <Route path="/dashboard" element={
+        <Route path="/sign/:token" element={<PublicSign />} />
+
+        <Route
+          path="/dashboard"
+          element={
             <ProtectedRoute>
               <Dashboard />
-            </ProtectedRoute>}/>
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/document/:id" element={
+        <Route
+          path="/document/:id"
+          element={
             <ProtectedRoute>
               <DocumentViewer />
             </ProtectedRoute>
-          }/>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
