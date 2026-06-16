@@ -10,16 +10,34 @@ function Navbar() {
 
   return (
     <nav className="flex justify-between items-center p-4 shadow">
-      <h1 className="text-xl font-bold">
-        Document Signature App
-      </h1>
-
-      <button
-        onClick={logout}
-        className="bg-red-500 text-white px-4 py-2 rounded"
+      <h1
+        style={{
+          fontSize: "24px",
+          fontWeight: "bold",
+        }}
       >
-        Logout
-      </button>
+        E-Sign Platform
+      </h1>
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+        }}
+      >
+        <button
+          onClick={() => navigate("/profile")}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Profile
+        </button>
+
+        <button
+          onClick={logout}
+          className="bg-red-500 text-white px-4 py-2 rounded"
+        >
+          Logout
+        </button>
+      </div>
     </nav>
   );
 }

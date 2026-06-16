@@ -12,15 +12,39 @@ const uploadDocument = async (req, res) => {
     });
 
     await createAuditLog({
-  documentId: document._id,
-  userId: req.user._id,
-  action: "DOCUMENT_UPLOADED",
-  details: `${document.title} uploaded`,
-});
+      documentId: document._id,
+      userId: req.user._id,
+      action: "DOCUMENT_UPLOADED",
+      details: `${document.title} uploaded`,
+    });
 
     res.status(201).json({
       message: "Document uploaded successfully",
       document,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+const deleteDocument = async (req, res) => {
+  try {
+    const document = await Document.findOne({
+      _id: req.params.id,
+      uploadedBy: req.user._id,
+    });
+
+    if (!document) {
+      return res.status(404).json({
+        message: "Document not found",
+      });
+    }
+
+    await Document.findByIdAndDelete(req.params.id);
+    res.status(200).json({
+      message: "Document deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
@@ -44,28 +68,21 @@ const getDocuments = async (req, res) => {
   }
 };
 
-const getDashboardStats = async (
-  req,
-  res
-) => {
+const getDashboardStats = async (req, res) => {
   try {
-    const documents =
-      await Document.find({
-        uploadedBy: req.user._id,
-      });
+    const documents = await Document.find({
+      uploadedBy: req.user._id,
+    });
 
-    const totalDocuments =
-      documents.length;
+    const totalDocuments = documents.length;
 
-    const signedDocuments =
-      documents.filter(
-        (doc) => doc.status === "Signed"
-      ).length;
+    const signedDocuments = documents.filter(
+      (doc) => doc.status === "Signed",
+    ).length;
 
-    const pendingDocuments =
-      documents.filter(
-        (doc) => doc.status === "Pending"
-      ).length;
+    const pendingDocuments = documents.filter(
+      (doc) => doc.status === "Pending",
+    ).length;
 
     res.status(200).json({
       totalDocuments,
@@ -79,4 +96,9 @@ const getDashboardStats = async (
   }
 };
 
-module.exports = {uploadDocument,getDocuments,getDashboardStats,};
+module.exports = {
+  uploadDocument,
+  getDocuments,
+  getDashboardStats,
+  deleteDocument,
+};
