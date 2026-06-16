@@ -6,9 +6,12 @@ const upload = require("../middleware/uploadMiddleware");
 const {
   uploadDocument,
   getDocuments,
+  getDashboardStats,
 } = require("../controllers/documentController");
 
 const router = express.Router();
+router.get("/stats", protect, getDashboardStats);
+router.get("/", protect, getDocuments);
 
 router.post(
   "/upload",
@@ -16,7 +19,5 @@ router.post(
   upload.single("pdf"),
   uploadDocument
 );
-
-router.get("/", protect, getDocuments);
 
 module.exports = router;
