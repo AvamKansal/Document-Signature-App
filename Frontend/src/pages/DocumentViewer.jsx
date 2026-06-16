@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../services/api";
 import PdfViewer from "../components/PdfViewer";
+import AuditHistory from "../components/AuditHistory";
 
 function DocumentViewer() {
   const { id } = useParams();
@@ -70,6 +71,7 @@ function DocumentViewer() {
         documentId={id}
         refreshSignatures={fetchSignatures}
       />
+      <AuditHistory documentId={id} />
     </div>
   );
 }

@@ -1,20 +1,13 @@
 const { v4: uuidv4 } = require("uuid");
-
+const createAuditLog = require("../utils/createAuditLog");
 const Document = require("../models/Document");
 
-const getDocumentByToken = async (
-  req,
-  res
-) => {
+const getDocumentByToken = async (req,res) => {
   try {
-    const document = await Document.findOne({
-      signingToken: req.params.token,
-    });
+    const document = await Document.findOne({signingToken: req.params.token,});
 
     if (!document) {
-      return res.status(404).json({
-        message: "Invalid signing link",
-      });
+      return res.status(404).json({message: "Invalid signing link",});
     }
 
     res.status(200).json(document);
@@ -25,25 +18,21 @@ const getDocumentByToken = async (
   }
 };
 
-const generateSigningLink = async (
-  req,
-  res
-) => {
+const generateSigningLink = async (req,res) => {
   try {
-    const { documentId, email } =
-      req.body;
-
+    const { documentId, email } = req.body;
     const token = uuidv4();
 
-    const document =
-      await Document.findByIdAndUpdate(
-        documentId,
-        {
-          signingToken: token,
-          signerEmail: email,
-        },
-        { new: true }
-      );
+const document = await Document.findByIdAndUpdate(documentId,{signingToken: token,signerEmail: email,},
+    { new: true }
+  );
+
+await createAuditLog({
+  documentId: document._id,
+  userId: req.user._id,
+  action: "SIGN_LINK_GENERATED",
+  details: `Signing link generated for ${email}`,
+});
 
     const signingLink =
       `http://localhost:5173/sign/${token}`;

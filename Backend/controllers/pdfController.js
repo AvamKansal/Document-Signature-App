@@ -4,6 +4,7 @@ const { PDFDocument, rgb } = require("pdf-lib");
 
 const Document = require("../models/Document");
 const Signature = require("../models/Signature");
+const createAuditLog = require("../utils/createAuditLog");
 
 const generateSignedPdf = async (req, res) => {
   try {
@@ -41,26 +42,21 @@ const generateSignedPdf = async (req, res) => {
     const pages = pdfDoc.getPages();
 
     signatures.forEach((sig) => {
-    if (!pages[sig.page - 1]) return;
-      const page =pages[sig.page - 1];
+      if (!pages[sig.page - 1]) return;
+
+      const page = pages[sig.page - 1];
 
       const { width, height } =
         page.getSize();
 
-      page.drawText(
-        "SIGNED",
-        {
-          x:
-            (sig.x / 100) *
-            width,
-          y:
-            height -
-            (sig.y / 100) *
-              height,
-          size: 16,
-          color: rgb(0, 0, 1),
-        }
-      );
+      page.drawText("SIGNED", {
+        x: (sig.x / 100) * width,
+        y:
+          height -
+          (sig.y / 100) * height,
+        size: 16,
+        color: rgb(0, 0, 1),
+      });
     });
 
     const pdfBytes =
@@ -77,11 +73,18 @@ const generateSignedPdf = async (req, res) => {
       outputPath,
       pdfBytes
     );
-    res.download(
-        outputPath,
-        `signed-document-${documentId}.pdf`
-    );
 
+    await createAuditLog({
+      documentId,
+      userId: req.user._id,
+      action: "PDF_GENERATED",
+      details: "Signed PDF generated",
+    });
+
+    res.download(
+      outputPath,
+      `signed-document-${documentId}.pdf`
+    );
   } catch (error) {
     res.status(500).json({
       message: error.message,
