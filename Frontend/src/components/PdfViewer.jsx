@@ -2,16 +2,14 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { useState } from "react";
 import API from "../services/api";
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 function PdfViewer({
   fileUrl,
   signatures = [],
   documentId,
   refreshSignatures,
+  onPdfClick, // New prop
 }) {
   const [numPages, setNumPages] = useState(null);
 
@@ -23,6 +21,11 @@ function PdfViewer({
 
     const y =
       ((e.clientY - rect.top) / rect.height) * 100;
+
+    if (onPdfClick) {
+      onPdfClick(x, y, 1); // We'll pass 1 as the default page for now
+      return;
+    }
 
     try {
       await API.post("/signatures", {
@@ -65,6 +68,8 @@ function PdfViewer({
             >
               <Page
                 pageNumber={index + 1}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
               />
 
               {signatures

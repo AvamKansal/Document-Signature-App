@@ -1,25 +1,34 @@
 const Document = require("../models/Document");
+
 const createAuditLog = require("../utils/createAuditLog");
 
 // Upload Document
+
 const uploadDocument = async (req, res) => {
   try {
     const document = await Document.create({
       title: req.body.title,
+
       fileName: req.file.filename,
-      filePath: req.file.path,
+
+      filePath: req.file.path.replace(/\\/g, "/"),
+
       uploadedBy: req.user._id,
     });
 
     await createAuditLog({
       documentId: document._id,
+
       userId: req.user._id,
+
       action: "DOCUMENT_UPLOADED",
+
       details: `${document.title} uploaded`,
     });
 
     res.status(201).json({
       message: "Document uploaded successfully",
+
       document,
     });
   } catch (error) {
@@ -33,6 +42,7 @@ const deleteDocument = async (req, res) => {
   try {
     const document = await Document.findOne({
       _id: req.params.id,
+
       uploadedBy: req.user._id,
     });
 
@@ -43,6 +53,7 @@ const deleteDocument = async (req, res) => {
     }
 
     await Document.findByIdAndDelete(req.params.id);
+
     res.status(200).json({
       message: "Document deleted successfully",
     });
@@ -54,6 +65,7 @@ const deleteDocument = async (req, res) => {
 };
 
 // Get All Documents Uploaded By Logged-in User
+
 const getDocuments = async (req, res) => {
   try {
     const documents = await Document.find({
@@ -86,7 +98,9 @@ const getDashboardStats = async (req, res) => {
 
     res.status(200).json({
       totalDocuments,
+
       signedDocuments,
+
       pendingDocuments,
     });
   } catch (error) {
@@ -98,7 +112,10 @@ const getDashboardStats = async (req, res) => {
 
 module.exports = {
   uploadDocument,
+
   getDocuments,
+
   getDashboardStats,
+
   deleteDocument,
 };

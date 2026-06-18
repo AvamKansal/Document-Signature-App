@@ -20,4 +20,9 @@ router.get(
   getDocumentByToken
 );
 
+router.post(
+  "/document/:token/sign",
+  require("../controllers/emailController").signDocumentByToken
+);
+
 module.exports = router;

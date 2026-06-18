@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 const createAuditLog = require("../utils/createAuditLog");
 const Document = require("../models/Document");
+const Signature = require("../models/Signature");
 
 const getDocumentByToken = async (req,res) => {
   try {
@@ -49,4 +50,34 @@ await createAuditLog({
   }
 };
 
-module.exports = {generateSigningLink,getDocumentByToken,};
+const signDocumentByToken = async (req, res) => {
+  try {
+    const { signaturePath, x, y, page } = req.body;
+    const document = await Document.findOne({ signingToken: req.params.token });
+    
+    if (!document) {
+      return res.status(404).json({ message: "Invalid signing link" });
+    }
+
+    document.status = "Signed";
+    await document.save();
+
+    if (signaturePath) {
+      await Signature.create({
+        documentId: document._id,
+        signerId: document.uploadedBy,
+        signatureImage: signaturePath,
+        x: x || 50,
+        y: y || 80,
+        page: page || 1,
+        status: "Signed"
+      });
+    }
+
+    res.status(200).json({ message: "Document signed successfully", document });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {generateSigningLink,getDocumentByToken, signDocumentByToken};
