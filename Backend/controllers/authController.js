@@ -1,13 +1,13 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 // Register User
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if user exists
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -16,10 +16,8 @@ const registerUser = async (req, res) => {
       });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
     const user = await User.create({
       name,
       email,
@@ -46,7 +44,6 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -55,11 +52,7 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // Compare password
-    const isMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(400).json({
@@ -67,7 +60,6 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // Generate JWT
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
@@ -90,7 +82,66 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Get profile details (API keys and webhook settings)
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      apiKey: user.apiKey,
+      globalWebhookUrl: user.globalWebhookUrl,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Generate Developer API Key
+const generateUserApiKey = async (req, res) => {
+  try {
+    // Generate secure prefix random key: es_...
+    const apiKey = "es_" + crypto.randomBytes(24).toString("hex");
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { apiKey },
+      { new: true }
+    );
+    res.status(200).json({
+      message: "API Key generated successfully",
+      apiKey: user.apiKey,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update Global Webhook URL
+const updateUserWebhookUrl = async (req, res) => {
+  try {
+    const { webhookUrl } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { globalWebhookUrl: webhookUrl },
+      { new: true }
+    );
+    res.status(200).json({
+      message: "Webhook URL updated successfully",
+      globalWebhookUrl: user.globalWebhookUrl,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  getUserProfile,
+  generateUserApiKey,
+  updateUserWebhookUrl,
 };

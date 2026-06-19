@@ -17,6 +17,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    apiKey: {
+      type: String,
+      unique: true,
+      sparse: true, // Allows multiple users to not have API keys without unique conflicts
+    },
+
+    globalWebhookUrl: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

@@ -8,6 +8,7 @@ const {
   getDocuments,
   getDashboardStats,
   deleteDocument,
+  useTemplate,
 } = require("../controllers/documentController");
 
 const router = express.Router();
@@ -16,5 +17,8 @@ router.get("/", protect, getDocuments);
 
 router.delete("/:id", protect, deleteDocument);
 router.post("/upload", protect, upload.single("pdf"), uploadDocument);
+
+// Instantiate reusable template route
+router.post("/use-template", protect, useTemplate);
 
 module.exports = router;
