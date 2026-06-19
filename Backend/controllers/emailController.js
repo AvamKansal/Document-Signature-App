@@ -6,6 +6,23 @@ const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
 const triggerWebhook = require("../utils/triggerWebhook");
 
+const getFrontendUrl = (req) => {
+  const referer = req.headers.referer;
+  if (referer) {
+    try {
+      const url = new URL(referer);
+      return url.origin;
+    } catch (e) {
+      // ignore
+    }
+  }
+  const origin = req.headers.origin;
+  if (origin) {
+    return origin;
+  }
+  return process.env.FRONTEND_URL || "http://localhost:5173";
+};
+
 const getDocumentByToken = async (req, res) => {
   try {
     const document = await Document.findOne({ "signers.signingToken": req.params.token });
@@ -85,7 +102,7 @@ const generateSigningLink = async (req, res) => {
     });
 
     const firstSigner = signerList[0];
-    const signingLink = `http://localhost:5173/sign/${firstSigner.signingToken}`;
+    const signingLink = `${getFrontendUrl(req)}/sign/${firstSigner.signingToken}`;
     
     await sendEmail({
       to: firstSigner.email,
@@ -170,7 +187,7 @@ const signDocumentByToken = async (req, res) => {
       nextSigner.signingToken = uuidv4();
       await document.save();
 
-      const signingLink = `http://localhost:5173/sign/${nextSigner.signingToken}`;
+      const signingLink = `${getFrontendUrl(req)}/sign/${nextSigner.signingToken}`;
       await sendEmail({
         to: nextSigner.email,
         subject: `Signature Request: ${document.title}`,

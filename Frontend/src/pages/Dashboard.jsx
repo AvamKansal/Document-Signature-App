@@ -267,7 +267,7 @@ function Dashboard() {
                                   // Copy current active signer's token link
                                   const activeSigner = doc.signers.find(s => s.status === "Pending");
                                   if (activeSigner && activeSigner.signingToken) {
-                                    copyLink(`http://localhost:5173/sign/${activeSigner.signingToken}`);
+                                    copyLink(`${window.location.origin}/sign/${activeSigner.signingToken}`);
                                   } else {
                                     generateLink(doc._id);
                                   }

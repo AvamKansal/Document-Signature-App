@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf";
-import API from "../services/api";
+import API, { BACKEND_URL } from "../services/api";
 import Navbar from "../components/Navbar";
 import { FiFileText, FiUser, FiTrash2, FiSave, FiCheckSquare, FiCalendar, FiEdit3, FiType } from "react-icons/fi";
 
@@ -263,7 +263,7 @@ function PrepareDocument() {
     );
   }
 
-  const fileUrl = `http://localhost:5000/${docDetails.filePath?.replace(/\\/g, "/")}`;
+  const fileUrl = `${BACKEND_URL}/${docDetails.filePath?.replace(/\\/g, "/")}`;
 
   return (
     <>

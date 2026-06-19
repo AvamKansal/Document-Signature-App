@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf";
-import API from "../services/api";
+import API, { BACKEND_URL } from "../services/api";
 import TypeSignatureModal from "../components/TypeSignatureModal";
 import { FiCheckCircle, FiEdit3, FiInfo, FiFileText } from "react-icons/fi";
 
@@ -120,7 +120,7 @@ function PublicSign() {
     );
   }
 
-  const fileUrl = `http://localhost:5000/${documentDetails.filePath?.replace(/\\/g, "/")}`;
+  const fileUrl = `${BACKEND_URL}/${documentDetails.filePath?.replace(/\\/g, "/")}`;
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 flex flex-col">
@@ -212,7 +212,7 @@ function PublicSign() {
                             return (
                               <img
                                 key={f._id}
-                                src={`http://localhost:5000/${f.value}`}
+                                src={`${BACKEND_URL}/${f.value}`}
                                 alt="Signature"
                                 style={fieldStyles}
                                 onClick={() => isCurrentSignerField && handleSignatureClick(f._id)}

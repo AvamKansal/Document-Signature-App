@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import API from "../services/api";
+import API, { BACKEND_URL } from "../services/api";
 import { FiDownload, FiCheckCircle, FiClock, FiFileText, FiChevronLeft, FiShare2, FiDatabase, FiList } from "react-icons/fi";
 
 function DocumentViewer() {
@@ -109,7 +109,7 @@ function DocumentViewer() {
     );
   }
 
-  const fileUrl = `http://localhost:5000/${document.filePath?.replace(/\\/g, "/")}`;
+  const fileUrl = `${BACKEND_URL}/${document.filePath?.replace(/\\/g, "/")}`;
 
   return (
     <>
@@ -227,7 +227,7 @@ function DocumentViewer() {
                             {f.type === "signature" || f.type === "initials" ? (
                               f.value ? (
                                 <a 
-                                  href={`http://localhost:5000/${f.value}`} 
+                                  href={`${BACKEND_URL}/${f.value}`} 
                                   target="_blank" 
                                   rel="noreferrer"
                                   className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
